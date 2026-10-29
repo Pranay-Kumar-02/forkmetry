@@ -4,25 +4,23 @@ Forkmetry incorporates and depends upon open-source software packages and refere
 
 ---
 
-## 1. Reference Implementation
+## 1. Reference Implementation & Heritage
 
 ### `fork-tree-visualizer`
-- **Origin:** [https://github.com/ajiteshmohan/fork-tree-visualizer](https://github.com/ajiteshmohan/fork-tree-visualizer)
+- **Repository:** [https://github.com/ajiteshmohan/fork-tree-visualizer](https://github.com/ajiteshmohan/fork-tree-visualizer)
 - **Author:** Ajitesh Mohan
-- **License:** MIT License
 - **Copyright:** Copyright (c) 2026 Ajitesh Mohan
-- **Terms:**
-  ```text
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
-  ```
+- **Permission & Licensing Status:** Used with author permission for educational adaptation. The upstream public repository does not contain an explicit open-source license file in its root directory. While direct reuse was granted for this project, downstream sub-licensing under MIT or commercial redistribution of inherited foundation code requires upstream license formalization.
+- **Retained Components from Reference Heritage:**
+  - Core domain interfaces in [`src/types/process.ts`](src/types/process.ts).
+  - POSIX educational curriculum text in [`src/components/LearnSystemCalls.tsx`](src/components/LearnSystemCalls.tsx).
+  - Django project framework foundation in [`backend/backend/`](backend/backend/).
+- **Original Forkmetry Components (Independently Implemented under MIT):**
+  - Cyber-Slate Engineering Design System (`src/index.css`, `src/components/Common.tsx`).
+  - Independent 2D tree layout engine (`src/utils/treeLayout.ts`).
+  - Independent CPU scheduling engine & comparator (`src/utils/schedulingAlgorithms.ts`, `src/components/SchedulingComparator.tsx`).
+  - OSContext state manager & dual-port API client (`src/context/OSContext.tsx`, `src/services/api.ts`).
+  - 21-test automated verification suite (`backend/api/tests.py`).
 
 ---
 

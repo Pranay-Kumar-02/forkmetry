@@ -273,7 +273,7 @@ npm run build
 ## 📜 Project Details, Attribution & Provenance
 
 - **Project Maintainer & Lead Developer:** **Pranay Kumar Vonamala** ([@Pranay-Kumar-02](https://github.com/Pranay-Kumar-02))
-- **Reference Heritage:** Forkmetry is derived, expanded, and substantially re-architected from the open-source reference project [`fork-tree-visualizer`](https://github.com/ajiteshmohan/fork-tree-visualizer) by Ajitesh Mohan. Reuse is authorized under applicable MIT permissions.
+- **Reference Heritage:** Forkmetry is derived, expanded, and substantially re-architected from the reference repository [`fork-tree-visualizer`](https://github.com/ajiteshmohan/fork-tree-visualizer) by Ajitesh Mohan. Used with author permission for educational adaptation. Note that the upstream reference repository does not publish an explicit open-source license file in its root directory; downstream redistribution and sublicensing terms are detailed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 - **Original Contributions in Forkmetry:**
   - Cyber-Slate Engineering Design System and interactive UI components.
   - Concurrent Multi-Algorithm Scheduling Comparator with automated leaderboard rankings.
@@ -284,13 +284,11 @@ npm run build
 
 ---
 
-## ⚖️ License
+## ⚖️ License & Intellectual Property
 
-This project is licensed under the **MIT License**.
+- **Original Forkmetry Code & Documentation:** Copyright (c) 2026 Pranay Kumar Vonamala. Licensed under the [MIT License](LICENSE).
+- **Reference Heritage & Retained Foundations:** Copyright (c) 2026 Ajitesh Mohan (`fork-tree-visualizer`). Used with permission. Note that upstream license formalization is required for unconditional public sublicensing.
 
-- **Forkmetry Implementation:** Copyright (c) 2026 Pranay Kumar Vonamala.
-- **Reference Implementation Portions:** Copyright (c) 2026 Ajitesh Mohan (`fork-tree-visualizer`).
-
-For full legal terms and third-party dependency disclosures, see:
+For comprehensive component-level disclosures, dependency licenses, and legal notices, see:
 - [LICENSE](LICENSE)
 - [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
