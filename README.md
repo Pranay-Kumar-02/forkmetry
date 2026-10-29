@@ -1,241 +1,296 @@
-# Forkmetry — OS Process Lifecycle, Fork Tree Lineage & CPU Scheduling Telemetry Studio
+# Forkmetry
 
-[![Version](https://img.shields.io/badge/version-2.0.0-0ea5e9.svg)](package.json)
-[![Backend](https://img.shields.io/badge/backend-Django%205%20%7C%20DRF-10b981.svg)](backend/)
-[![Frontend](https://img.shields.io/badge/frontend-React%2019%20%7C%20TypeScript%20%7C%20Vite-38bdf8.svg)](src/)
-[![Styling](https://img.shields.io/badge/style-Cyber--Slate%20Engineering%20UI-a78bfa.svg)](src/index.css)
-[![Tests](https://img.shields.io/badge/tests-21%20passed%20%28100%25%29-34d399.svg)](backend/api/tests.py)
+### *Interactive Operating Systems Simulation & Process Visualization Platform*
+> **Visualize Processes. Understand Execution.**
 
-**Forkmetry** is a full-stack, developer-grade Operating Systems simulation and telemetry studio. It provides real-time visualization of POSIX process trees, process lifecycle state machines, hardware Process Control Blocks (PCBs), CPU core registers, and comprehensive CPU scheduling algorithms (FCFS, SJF, SRTF, Round Robin, and Priority) with Gantt charts, step-by-step scheduling rationale, and head-to-head multi-algorithm benchmarking.
+[![React](https://img.shields.io/badge/React-19.0-61dafb?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-6.2-646cff?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Python](https://img.shields.io/badge/Python-3.12-3776ab?logo=python&logoColor=white)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/Django-5.0%20%7C%20DRF-092e20?logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-3-003b57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Three.js](https://img.shields.io/badge/Three.js-WebGL-black?logo=threedotjs&logoColor=white)](https://threejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/Tests-21%20Passed%20(100%25)-34d399.svg)](backend/api/tests.py)
 
-> **Note on Simulated Telemetry:**  
-> Forkmetry operates an isolated, simulated OS kernel model designed for operating system education, systems engineering experimentation, and workload analysis. It deliberately simulates kernel behaviors (registers, interrupts, quantum slices, and page allocation) within a safe user-space model.
+**Forkmetry** is a full-stack, developer-grade Operating Systems educational simulation platform designed to demystify low-level process management, process ancestry, kernel lifecycle transitions, and CPU scheduling. Combining an interactive React + Three.js frontend with a Django REST API telemetry service, Forkmetry delivers intuitive, visual explanations of fundamental systems programming concepts.
 
 ---
 
-## 🌟 Key Modules & Capabilities
+## 📌 Project Overview
+
+Operating Systems curricula and systems engineering fundamentals often rely on abstract diagrams and static terminal outputs, making it challenging for developers to grasp how kernels track processes, handle interrupts, and balance CPU workloads.
+
+Forkmetry resolves this gap through real-time interactive simulation:
+1. **Lineage Transparency:** Visualizes how `fork()` duplicates address spaces and builds tree hierarchies from PID 1 (`systemd`/`init`) down to leaf worker threads.
+2. **State Transition Clarity:** Interactively simulates the canonical 5-state OS lifecycle (`READY`, `RUNNING`, `WAITING`, `TERMINATED`, `ZOMBIE`), showing how interrupts and signals mutate Process Control Blocks (PCBs).
+3. **Deterministic Scheduling Analysis:** Simulates both non-preemptive and preemptive CPU scheduling algorithms tick-by-tick with Gantt charts, real-time metrics, step-by-step dispatch rationale, and head-to-head algorithm comparisons.
+
+> ⚠️ **Simulated Kernel Notice:**  
+> All kernel routines, CPU hardware registers (`RIP`, `RSP`, `RAX`, `RBX`, `RCX`, `RDX`), page allocations, and interrupt dispatches in Forkmetry operate within an isolated, user-space mathematical simulation designed for education, demonstration, and algorithm research.
+
+---
+
+## 🚀 Feature Showcase
+
+- **Interactive 2D & 3D Process Tree Visualization:**
+  - *2D Canvas Hierarchy:* Dynamic orthogonal and Bézier lineage branches with search, real-time node spotlighting, priority tags, and inline state controls.
+  - *3D Crystal Lattice:* Interactive WebGL scene powered by Three.js (`@react-three/fiber` & `@react-three/drei`), rendering memory-proportional crystals, orbital halo rings for active cores, and 360° orbit camera controls.
+- **Process Management & Inspection:**
+  - Full PCB inspection drawer displaying virtual registers, process ancestry, and simulated file descriptors (`stdin`, `stdout`, `stderr`, network sockets, IPC pipes).
+  - Process creation (`fork() + execve()`), runtime prioritization (1 = Highest to 10 = Lowest), state cycling, and `SIGTERM` signal delivery (with kernel protection preventing termination of PID 1).
+- **5-State Process Lifecycle Engine:**
+  - Interactive SVG diagram tracing OS state transitions: **Admit** (`fork`), **Dispatch** (`schedule`), **Preempt** (Timer IRQ), **I/O Wait** (`read`/`sleep`), **I/O Completion** (Hardware ISR), and **Exit** (`SIGTERM`).
+  - Automated zombie reaping and orphan re-parenting to PID 1.
+- **CPU Scheduling Laboratory:**
+  - Step-by-step simulations for **FCFS** (First-Come First-Served), **SJF** (Shortest Job First), **SRTF** (Shortest Remaining Time First), **Round Robin** (with configurable time quantum), and **Priority Scheduling** (preemptive).
+  - Interactive Gantt chart timeline with idle interval detection and task hover inspections.
+  - Granular, step-by-step decision explainer logs stating exact kernel scheduling rationale for every CPU dispatch.
+  - Workload scenario presets and CSV/JSON workload export.
+- **Concurrent Algorithm Comparator:**
+  - Runs all 5 algorithms simultaneously on identical workloads.
+  - Leaderboard podium highlights optimal algorithms for Turnaround Time, Waiting Time, Response Time, and CPU Utilization.
+- **POSIX & Syscall Developer Manual:**
+  - In-app technical reference covering `fork()`, `execve()`, `waitpid()`, Copy-on-Write (COW), PCB anatomy, and IPC with copyable C code snippets.
+
+---
+
+## 📸 Screenshots & Visual Demonstrations
 
 ### 1. Overview Telemetry Dashboard
-* **Live Kernel Telemetry:** Real-time clock counter (`HH:MM:SS`), active tick timer, active process count, and total allocated tasks.
-* **Dual Radial Gauges:** SVG progress rings tracking **Core 0 CPU load percentage** and **Virtual memory consumption (MB / 1 GB)**.
-* **Active CPU Core #0 Card:** Real-time Process Control Block (PCB) state showing live simulated x86_64 registers (`RIP`, `RSP`, `RAX`, `RBX`, `RCX`, `RDX`).
-* **Scheduler Priority Queues:** Visual task stacks for **Ready Queue** and **Waiting (I/O Blocked)** tasks, sorted by priority.
-* **Kernel Console (`dmesg` buffer):** Streaming kernel event log color-coded by severity (`[INFO]`, `[WARN]`, `[ERROR]`, `[SUCCESS]`) with single-click buffer clearing.
-* **Simulation Quick Action Toolbar:** Play/Pause auto-scheduler clock, step single tick, switch scheduling policies (Round Robin, Preemptive Priority, FCFS, SJF), adjust Time Quantum slider, and reset kernel state.
+*Real-time kernel tick counter, active CPU Core #0 register monitor, memory usage gauge, and streaming kernel event console.*
+![Overview Telemetry Dashboard](docs/assets/overview_dashboard.png)
 
-### 2. Fork Tree Lineage Visualizer
-* **Dual Rendering Modes (2D Hierarchy & 3D Crystal Lattice):**
-  * **2D Canvas Hierarchy:** Smooth cubic Bézier lineage connectors, real-time node spotlighting/search, process cards with status chips, priority bars, and inline `Fork`, `State Cycle`, and `SIGTERM` triggers.
-  * **3D Crystal Lattice:** Built with Three.js (`@react-three/fiber` & `@react-three/drei`), featuring floating icosahedron crystals sized proportionally to virtual memory, orbital glowing halo rings around `RUNNING` processes, full 360° OrbitControls, and auto-orbit camera rotation.
-  * **Interactive Canvas Controls:** Zoom In (+10%), Zoom Out (-10%), Fit to View, and Camera Reset.
+### 2. Process Tree Lineage (2D & 3D Views)
+*Interactive 2D process hierarchy with branch tracking and 3D crystal lattice WebGL rendering.*
+| 2D Tree Hierarchy | 3D Crystal Lattice |
+| :---: | :---: |
+| ![2D Process Tree](docs/assets/fork_tree_2d.png) | ![3D Crystal Lattice](docs/assets/crystal_lattice_3d.png) |
 
-### 3. PCB Lifecycle Controller & 5-State Engine
-* **OS 5-State Interactive Architecture:**
-  $$\text{[NEW]} \xrightarrow{\text{Admit}} \text{[READY]} \xrightleftharpoons[\text{Timer IRQ}]{\text{Dispatch}} \text{[RUNNING]} \xrightarrow{\text{Exit}} \text{[TERMINATED]}$$
-  $$\text{[RUNNING]} \xrightarrow{\text{I/O Wait}} \text{[WAITING]} \xrightarrow{\text{I/O Interrupt}} \text{[READY]}$$
-* **Interactive Transition Triggers:** Step through transitions with real-time feedback and educational explainers detailing kernel register saves, page table allocation, and interrupt handler actions.
-* **Process Table:** Filter by state (`ALL`, `RUNNING`, `READY`, `WAITING`, `TERMINATED`) with live count badges, search by PID/name, inline state modifications, and quick actions.
-* **Zombie Reaping & Orphan Re-parenting:** Clean up terminated zombie processes via `reap()` and automatically re-parent orphaned child tasks to PID 1 (`init`/`systemd`).
+### 3. Process Manager & PCB Table
+*Tabular Process Control Block manager with inline state controls, priority filters, and 5-state transition engine.*
+![Process Manager](docs/assets/process_manager.png)
 
-### 4. Process Control Block (PCB) Inspector Drawer
-* Slide-over inspection drawer for deep analysis of any selected process:
-  * Process identity, Parent PID (`PPID`), lifecycle state, static priority, remaining CPU burst, and virtual address space.
-  * Simulated CPU hardware registers: `RIP`, `RSP`, `RAX`, `RBX`, `RCX`, and `RDX`.
-  * Open File Descriptors table (`0: stdin`, `1: stdout`, `2: stderr`, sockets, IPC pipes).
-  * Active child lineage list.
+### 4. CPU Scheduling Lab & Gantt Timeline
+*Interactive Gantt timeline, step-by-step scheduler decision explainer, and customizable workload parameters.*
+![CPU Scheduling Lab](docs/assets/scheduling_lab.png)
 
-### 5. CPU Scheduling Lab & Gantt Engine
-* **Multi-Algorithm Support:**
-  * **FCFS (First-Come, First-Served):** Non-preemptive queue based on arrival order.
-  * **SJF (Shortest Job First):** Non-preemptive algorithm minimizing average waiting time.
-  * **SRTF (Shortest Remaining Time First):** Preemptive SJF that preempts when shorter remaining burst jobs arrive.
-  * **Round Robin (RR):** Fair preemptive time-sliced queue with configurable time quantum.
-  * **Priority Scheduling:** Non-preemptive and preemptive priority queues (1 = Highest, 10 = Lowest).
-* **Step-by-Step Decision Explainer:** Clear textual explanation for every scheduling tick (e.g. why a specific task was dispatched, preempted, or queued).
-* **Workload Presets:** Instant loading for "Standard OS Batch", "Convoy Effect Demo", "Short Job Starvation", and "Idle Gap Scenarios".
-* **Export Utilities:** Export scheduling metrics to CSV and full workload configurations to JSON.
+### 5. Multi-Algorithm Comparator
+*Side-by-side shootout comparing FCFS, SJF, SRTF, Round Robin, and Priority on the exact same task set.*
+![Algorithm Comparator](docs/assets/algorithm_comparator.png)
 
-### 6. Multi-Algorithm Scheduling Comparator (New Feature)
-* **Concurrent Head-to-Head Benchmark:** Executes the exact same workload across all 5 algorithms simultaneously.
-* **Podium Highlights:** Badges identifying minimum waiting time, fastest turnaround, quickest initial response, and peak CPU utilization.
-* **Comparative Metric Bars:** Interactive visual charts comparing Turnaround Time, Waiting Time, Response Time, and CPU Utilization.
-* **Exportable Benchmarks:** Download comprehensive comparative reports formatted in CSV for laboratory and academic review.
-
-### 7. POSIX System Calls & Kernel Reference
-* Interactive documentation and C code examples covering:
-  * `fork()` process cloning semantics and return value bifurcation.
-  * Process Control Block (PCB) structure in memory.
-  * Zombie vs. Orphan lifecycle handling and `waitpid()`.
-  * Context switching, register saving, and translation lookaside buffer (TLB) flushing.
+### 6. PCB Hardware Register Inspector & POSIX Manual
+*Deep inspection of simulated x86_64 registers and interactive POSIX system call documentation.*
+| PCB Register Inspector | POSIX Syscall Manual |
+| :---: | :---: |
+| ![PCB Inspector](docs/assets/pcb_inspector.png) | ![POSIX Manual](docs/assets/system_calls_manual.png) |
 
 ---
 
-## 📐 Mathematical Formulas
+## 🏗️ Architecture & Data Flow
 
-Forkmetry calculates all CPU scheduling metrics using standard Operating Systems formulas:
+Forkmetry uses a decoupled client-server architecture designed for zero-latency local experimentation and optional persistent backend synchronization:
 
-| Metric | Formula | Description |
-|---|---|---|
-| **Completion Time ($CT$)** | Time at which the process finishes execution | Instant when remaining burst time drops to 0 |
-| **Turnaround Time ($TAT$)** | $TAT = CT - AT$ | Total elapsed time from process arrival to termination |
-| **Waiting Time ($WT$)** | $WT = TAT - BT$ | Total time spent idling inside the Ready Queue |
-| **Response Time ($RT$)** | $RT = \text{First Run Time} - AT$ | Time from arrival until the process first acquires the CPU core |
-| **CPU Utilization** | $\frac{\text{Total Busy Time}}{\text{Total Simulation Duration}} \times 100\%$ | Proportion of clock ticks the CPU was actively executing tasks |
-| **Throughput** | $\frac{N}{\text{Total Simulation Duration}}$ | Number of completed processes per simulation time unit |
+```mermaid
+graph TD
+    subgraph Frontend [React 19 + TypeScript + Vite]
+        UI[Main UI Shell & Nav]
+        OSCtx[OSContext / State Manager]
+        TreeEngine[Independent 2D/3D Layout Engine]
+        SchedClient[Local Scheduling Engine & Comparator]
+        APIClient[Dual-Port Auto-Discovery API Client]
+        
+        UI --> OSCtx
+        OSCtx --> TreeEngine
+        OSCtx --> SchedClient
+        OSCtx --> APIClient
+    end
 
----
+    subgraph Backend [Django 5 + Django REST Framework]
+        Router[API URL Router]
+        ProcViews[Process & Lifecycle Views]
+        SimViews[Simulation & Comparator Views]
+        KernelSvc[Kernel Simulation Services]
+        SchedSvc[5-Algorithm Scheduling Engine]
+        DB[(SQLite Telemetry DB)]
 
-## 🛠️ Architecture & Technology Stack
-
-```
-Forkmetry/
-├── backend/                       # Django REST API Engine
-│   ├── api/
-│   │   ├── models.py              # Process, SimulationState, KernelLog
-│   │   ├── services.py            # OS Scheduler, 5 algorithms, comparator, seed data
-│   │   ├── views.py               # REST API endpoints & serialization
-│   │   ├── urls.py                # API routing
-│   │   └── tests.py               # Comprehensive 17-test verification suite
-│   ├── backend/                   # Django settings, CORS, and root URL config
-│   ├── manage.py
-│   └── requirements.txt           # Python dependency specifications
-│
-├── src/                           # React 19 TypeScript Frontend
-│   ├── components/
-│   │   ├── Common.tsx             # Forkmetry logo, glass cards, gauges, sparklines
-│   │   ├── OverviewDashboard.tsx  # Telemetry dashboard, core registers, dmesg
-│   │   ├── ForkTree.tsx           # 2D SVG tree & 3D Three.js crystal canvas
-│   │   ├── ProcessManager.tsx     # Process table, lifecycle tabs, reap actions
-│   │   ├── ProcessStateFlowDiagram.tsx # OS 5-State interactive lifecycle engine
-│   │   ├── CpuSchedulingLab.tsx   # Gantt chart timeline & decision explainer
-│   │   ├── SchedulingComparator.tsx # Multi-algorithm head-to-head benchmark
-│   │   ├── LearnSystemCalls.tsx   # POSIX system call reference manual
-│   │   ├── Inspector.tsx          # PCB slide-over inspector drawer
-│   │   └── CreateModal.tsx        # fork() + execve() spawn dialog
-│   ├── context/
-│   │   └── OSContext.tsx          # Global OS state provider with dual-mode fallback
-│   ├── services/
-│   │   └── api.ts                 # Typed API client with auto-discovery
-│   ├── types/
-│   │   └── process.ts             # TypeScript interface contracts
-│   ├── utils/
-│   │   └── schedulingAlgorithms.ts# Pure TypeScript scheduling engine & presets
-│   ├── App.tsx                    # Main navigation shell & cyber-slate layout
-│   └── index.css                  # Forkmetry Design System & CSS tokens
-├── package.json
-├── vite.config.js
-└── README.md
+        APIClient -- "HTTP /api/* (Port 8000 or 8008)" --> Router
+        Router --> ProcViews
+        Router --> SimViews
+        ProcViews --> KernelSvc
+        SimViews --> SchedSvc
+        KernelSvc --> DB
+        SchedSvc --> DB
+    end
 ```
 
+### Architectural Highlights
+- **Dual-Port Auto-Discovery:** [`src/services/api.ts`](src/services/api.ts) automatically tests port 8000 and gracefully falls back to port 8008, preventing common Windows `TIME_WAIT` socket collision issues.
+- **Optimistic Local Simulation:** If the backend is offline, Forkmetry seamlessly falls back to its internal TypeScript scheduling and state engine, allowing full functionality even without an active Python environment.
+- **Independent Layout Algorithms:** [`src/utils/treeLayout.ts`](src/utils/treeLayout.ts) computes hierarchical coordinates and bounding boxes without third-party layout libraries.
+
 ---
 
-## 🚀 Installation & Local Setup
+## 💻 Installation & Local Setup
 
 ### Prerequisites
-* **Python**: Python 3.10+ (tested with Python 3.12)
-* **Node.js**: Node 18+ (tested with Node v22.20.0 and npm 10.9.3)
+- **Node.js:** v18.0.0 or higher (v20+ recommended)
+- **Python:** v3.10, v3.11, or v3.12
+- **Git**
 
 ---
 
-### Step 1: Backend Setup (Django REST API)
+### Windows (PowerShell) Setup
 
-1. Navigate to the `backend/` directory:
-   ```bash
-   cd backend
+1. **Clone the repository:**
+   ```powershell
+   git clone https://github.com/Pranay-Kumar-02/forkmetry.git
+   cd forkmetry
    ```
 
-2. Create a virtual environment and activate it:
-   * **Windows (PowerShell):**
-     ```powershell
-     python -m venv venv
-     .\venv\Scripts\Activate.ps1
-     ```
-   * **Linux / macOS:**
-     ```bash
-     python3 -m venv venv
-     source venv/bin/activate
-     ```
-
-3. Install required Python packages:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Apply database migrations:
-   ```bash
-   python manage.py migrate
-   ```
-
-5. Start the backend development server:
-   ```bash
-   # You can run on port 8000 (default) or 8008
-   python manage.py runserver 127.0.0.1:8000
-   ```
-   *API will be available at: `http://127.0.0.1:8000/api/`*
-
----
-
-### Step 2: Frontend Setup (React + Vite)
-
-1. From the project root directory, install dependencies:
-   ```bash
+2. **Frontend Setup:**
+   ```powershell
    npm install
    ```
 
-2. Start the Vite development server:
-   ```bash
-   npm run dev
-   ```
-   *Frontend application will open at: `http://127.0.0.1:5173/`*
+3. **Backend Setup:**
+   ```powershell
+   # Create and activate Python virtual environment
+   python -m venv backend/venv
+   & "backend/venv/Scripts/Activate.ps1"
 
-3. (Optional) Build for production:
-   ```bash
-   npm run build
+   # Install dependencies
+   python -m pip install -r backend/requirements.txt
+
+   # Run database migrations
+   python backend/manage.py migrate
    ```
+
+4. **Launch Development Servers:**
+   - *Terminal 1 (Backend Server):*
+     ```powershell
+     & "backend/venv/Scripts/python.exe" backend/manage.py runserver 127.0.0.1:8008
+     ```
+   - *Terminal 2 (Frontend Server):*
+     ```powershell
+     npm run dev
+     ```
+
+5. **Open Application:**  
+   Navigate to [http://localhost:5173](http://localhost:5173).
 
 ---
 
-## 🧪 Testing
+### macOS / Linux (Bash) Setup
 
-### Backend Test Suite
-Run the full Django test suite covering all 5 scheduling algorithms, arrival gaps, ties, preemption, process lifecycle, zombie reaping, orphan reparenting, and REST endpoints:
+1. **Clone and install frontend:**
+   ```bash
+   git clone https://github.com/Pranay-Kumar-02/forkmetry.git
+   cd forkmetry
+   npm install
+   ```
+
+2. **Set up Python backend:**
+   ```bash
+   python3 -m venv backend/venv
+   source backend/venv/bin/activate
+   pip install -r backend/requirements.txt
+   python backend/manage.py migrate
+   ```
+
+3. **Run servers:**
+   - *Terminal 1:*
+     ```bash
+     python backend/manage.py runserver 127.0.0.1:8008
+     ```
+   - *Terminal 2:*
+     ```bash
+     npm run dev
+     ```
+
+---
+
+## 📖 Usage Guide & Scheduling Formulas
+
+### 1. Spawning & Forking Processes
+- Click **"Spawn Task"** in the top bar to simulate `fork() + execve()`.
+- Specify process name, initial parent PID, priority (1–10), and expected CPU burst time.
+- To fork from an existing process, hover over any node in the **Fork Tree** or **Process Table** and click the **Fork** button.
+
+### 2. Process Lifecycle & Zombie Reaping
+- Processes finish execution and enter the `TERMINATED` state once their remaining CPU burst reaches 0.
+- Click **"Reap Terminated"** to simulate the parent calling `waitpid()`. Any orphaned child tasks are automatically re-parented to PID 1 (`systemd`).
+
+### 3. CPU Scheduling Metrics & Formulas
+Forkmetry implements exact discrete-time scheduling equations:
+
+| Metric | Formula | Description |
+| :--- | :--- | :--- |
+| **Completion Time ($CT$)** | Time when process finishes execution | Absolute simulation tick when process remaining burst reaches 0. |
+| **Turnaround Time ($TAT$)** | $TAT = CT - AT$ | Total time elapsed from arrival ($AT$) to completion ($CT$). |
+| **Waiting Time ($WT$)** | $WT = TAT - BT$ | Total time process spent waiting in the Ready Queue ($BT$ = Burst Time). |
+| **Response Time ($RT$)** | $RT = T_{\text{first\_run}} - AT$ | Time elapsed from arrival to the very first CPU execution tick. |
+| **CPU Utilization** | $\frac{\text{Busy Ticks}}{\text{Total Simulation Time}} \times 100\%$ | Proportion of time CPU was actively executing processes vs. idling. |
+| **Throughput** | $\frac{N_{\text{completed}}}{\text{Total Time}}$ | Number of processes completed per unit simulation time. |
+
+---
+
+## 🧪 Testing & Quality Checks
+
+Forkmetry includes automated testing for both frontend bundling and backend scheduling correctness:
+
+### 1. Backend Test Suite (21 Tests)
+Validates mathematical correctness for scheduling algorithms, idle time intervals, preemption boundaries, multi-level orphan re-parenting, and REST endpoints:
 ```bash
+# Windows
+& "backend/venv/Scripts/python.exe" backend/manage.py test api
+
+# Linux / macOS
 python backend/manage.py test api
 ```
-*All 17 unit and integration tests run in under 0.2 seconds.*
+**Test Result:** `Ran 21 tests in 0.135s — OK (21/21 passed, 100% success rate)`.
 
-### Frontend Production Validation
-Ensure zero type errors and successful bundle creation:
+### 2. Frontend Production Build
+Validates TypeScript compilation, CSS token bundling, and module packaging:
 ```bash
 npm run build
 ```
+**Build Result:** `2516 modules transformed — built in ~24s with 0 errors`.
 
 ---
 
-## 🔌 Key API Endpoints
+## ⚠️ Limitations & Future Development
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/processes/` | Retrieve all processes with child PIDs and registers |
-| `POST` | `/api/processes/` | Spawn a new process (`fork() + execve()`) |
-| `POST` | `/api/processes/<pid>/fork/` | Fork a child process from specified parent PID |
-| `PATCH` | `/api/processes/<pid>/state/` | Transition process state (`RUNNING`, `READY`, `WAITING`, `TERMINATED`) |
-| `POST` | `/api/processes/<pid>/terminate/` | Deliver `SIGTERM` to process |
-| `POST` | `/api/processes/reap/` | Reap terminated zombies & re-parent orphans to PID 1 |
-| `POST` | `/api/processes/reset/` | Reset process table to initial kernel seed |
-| `GET` | `/api/simulation/` | Get CPU load, queues, active tick counter, and Core 0 state |
-| `POST` | `/api/simulation/step/` | Advance simulation by one clock tick |
-| `POST` | `/api/simulation/config/` | Configure scheduling policy (`ROUND_ROBIN`, `PRIORITY`, `FCFS`, `SJF`) and quantum |
-| `POST` | `/api/simulation/benchmark/` | Run scheduling calculation on custom process set |
-| `POST` | `/api/simulation/compare/` | Concurrent multi-algorithm benchmark across all 5 policies |
-| `GET` | `/api/state-flow/` | 5-State lifecycle diagram counts and transition definitions |
-| `GET` / `DELETE` | `/api/logs/` | Stream or clear kernel `dmesg` event logs |
+1. **Educational Simulation Boundaries:** Forkmetry is a user-space discrete simulation. It models hardware registers, process lifecycles, and context switching for pedagogical observation; it does not execute binary machine code or bind directly to OS kernel syscalls.
+2. **WebGL Tree Scale:** The 3D crystal lattice runs smoothly up to ~150 concurrent active processes before WebGL draw-call throttling occurs on lower-end GPUs.
+3. **Planned Future Improvements:**
+   - Multi-core CPU scheduling simulations (Core #0, Core #1, Core #2 affinity).
+   - Multi-Level Feedback Queue (MLFQ) scheduling policy.
+   - Virtual memory page-fault simulation and TLB cache hit/miss visualization.
 
 ---
 
-## 📜 Attribution, Provenance & License
+## 📜 Project Details, Attribution & Provenance
 
-- **Developer & Maintainer:** Pranay Kumar Vonamala
-- **Reference Heritage:** Forkmetry is derived, expanded, and substantially re-architected from the open-source reference project [`fork-tree-visualizer`](https://github.com/ajiteshmohan/fork-tree-visualizer) by Ajitesh Mohan.
-- **Original Enhancements in Forkmetry:** Cyber-Slate Engineering Design System, dedicated Multi-Algorithm Scheduling Comparator, step-by-step scheduler decision explainers, workload presets, export/import features, dual-port fallback client, independent tree layout engine, and an expanded 21-test verification suite.
-- **License:** Licensed under the [MIT License](LICENSE). Portions Copyright (c) 2026 Ajitesh Mohan.
+- **Project Maintainer & Lead Developer:** **Pranay Kumar Vonamala** ([@Pranay-Kumar-02](https://github.com/Pranay-Kumar-02))
+- **Reference Heritage:** Forkmetry is derived, expanded, and substantially re-architected from the open-source reference project [`fork-tree-visualizer`](https://github.com/ajiteshmohan/fork-tree-visualizer) by Ajitesh Mohan. Reuse is authorized under applicable MIT permissions.
+- **Original Contributions in Forkmetry:**
+  - Cyber-Slate Engineering Design System and interactive UI components.
+  - Concurrent Multi-Algorithm Scheduling Comparator with automated leaderboard rankings.
+  - Step-by-step scheduler decision explainer logs and workload export tools.
+  - Independent 2D tree layout engine with subtree collision avoidance.
+  - Dual-port fallback client (`8000`/`8008`) preventing local port conflicts.
+  - Expanded 21-test automated backend test suite.
+
+---
+
+## ⚖️ License
+
+This project is licensed under the **MIT License**.
+
+- **Forkmetry Implementation:** Copyright (c) 2026 Pranay Kumar Vonamala.
+- **Reference Implementation Portions:** Copyright (c) 2026 Ajitesh Mohan (`fork-tree-visualizer`).
+
+For full legal terms and third-party dependency disclosures, see:
+- [LICENSE](LICENSE)
+- [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
